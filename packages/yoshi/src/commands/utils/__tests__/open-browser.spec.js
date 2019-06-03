@@ -1,6 +1,6 @@
 jest.mock('react-dev-utils/openBrowser');
 
-const openBrowser = require('./open-browser');
+const openBrowser = require('../open-browser');
 const originalOpenBrowserMock = require('react-dev-utils/openBrowser');
 
 const url1 = 'https://url1.com';
