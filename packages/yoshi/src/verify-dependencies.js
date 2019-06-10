@@ -1,7 +1,7 @@
 const path = require('path');
 const chalk = require('chalk');
 const semver = require('semver');
-const importCwd = require('import-cwd');
+const Module = require('module');
 
 const { version: yoshiVersion } = require('../package.json');
 
@@ -11,10 +11,25 @@ const relatedPackages = [
   'yoshi-angular-dependencies',
 ];
 
+const resolveFromSilent = moduleId => {
+  const fromDir = path.resolve(process.cwd());
+  const fromFile = path.join(fromDir, 'noop.js');
+
+  try {
+    return require(Module._resolveFilename(moduleId, {
+      id: fromFile,
+      filename: fromFile,
+      paths: Module._nodeModulePaths(fromDir).slice(0, 1),
+    }));
+  } catch (err) {
+    return null;
+  }
+};
+
 module.exports = async () => {
   const outdatedPackages = relatedPackages
     .map(packageName => path.join(packageName, 'package.json'))
-    .map(packageJsonPath => importCwd.silent(packageJsonPath))
+    .map(packageJsonPath => resolveFromSilent(packageJsonPath))
     .filter(pkg => {
       const diff = pkg && semver.diff(pkg.version, yoshiVersion);
 
