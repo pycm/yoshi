@@ -796,6 +796,15 @@ function createClientWebpackConfig({
 function createServerWebpackConfig({ isDebug = true, isHmr = false } = {}) {
   const config = createCommonWebpackConfig({ isDebug, isHmr });
 
+  const entryServer = possibleServerEntries.find(exists);
+
+  if (!entryServer) {
+    throw new Error(
+      `Can't find entry server. 
+          Maybe you need to create ${possibleServerEntries.map(fileName => `"${fileName}`).join(' or ')} file.`
+    );
+  }
+
   const styleLoaders = getStyleLoaders({
     embedCss: false,
     isHmr: false,
@@ -810,7 +819,7 @@ function createServerWebpackConfig({ isDebug = true, isHmr = false } = {}) {
     target: 'node',
 
     entry: {
-      server: possibleServerEntries.find(exists) || possibleServerEntries[0],
+      server: entryServer,
     },
 
     output: {
